@@ -5,17 +5,19 @@ import org.example.model.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Класс TrainingRepository отвечает за хранение и управление данными тренировок.
  */
 public class TrainingRepository {
 
-    private final List<Training> trainings;
+    private final Map<User, List<Training>> trainings;
 
     public TrainingRepository() {
-        this.trainings = new ArrayList<>();
+        this.trainings = new HashMap<>();
     }
 
     /**
@@ -23,7 +25,7 @@ public class TrainingRepository {
      * @param training Новая тренировка для добавления
      */
     public void addTraining(Training training) {
-        trainings.add(training);
+        trainings.computeIfAbsent(training.getUser(), k -> new ArrayList<>()).add(training);
     }
 
 
@@ -33,15 +35,7 @@ public class TrainingRepository {
      * @return Список тренировок пользователя.
      */
     public List<Training> getUserTrainings(User user) {
-        List<Training> userTrainings = new ArrayList<>();
-        trainings.forEach(
-                training -> {
-                    if (training.getUser().equals(user)) {
-                        userTrainings.add(training);
-                    }
-                }
-        );
-        return userTrainings;
+        return trainings.getOrDefault(user, new ArrayList<>());
     }
 
 
@@ -50,16 +44,9 @@ public class TrainingRepository {
      * @return Список тренировок пользователей
      */
     public List<Training> getAllTrainings() {
-        return trainings;
-    }
-
-    /**
-     * Возвращает тренировку по id
-     * @param id
-     * @return тренировка
-     */
-    public Training getTrainingById(int id) {
-        return trainings.get(id);
+        List<Training> allTrainings = new ArrayList<>();
+        trainings.values().forEach(allTrainings::addAll);
+        return allTrainings;
     }
 
     /**
@@ -71,8 +58,8 @@ public class TrainingRepository {
      * @param additionalInformation Дополнительная информация о тренировке.
      * @param dateTime Дата и время проведения тренировки.
      */
-    public void editTraining(int trainingId, String type, int durationMinutes, int burnedCalories, String additionalInformation, LocalDateTime dateTime) {
-        Training training = trainings.get(trainingId);
+    public void editTraining(User user, int trainingId, String type, int durationMinutes, int burnedCalories, String additionalInformation, LocalDateTime dateTime) {
+        Training training = trainings.get(user).get(trainingId);
         training.setType(type);
         training.setDurationMinutes(durationMinutes);
         training.setBurnedCalories(burnedCalories);
@@ -84,7 +71,8 @@ public class TrainingRepository {
      * Удаляет тренировку из репозитория по id
      * @param trainingId id тренировки
      */
-    public void deleteTraining(int trainingId) {
+    public void deleteTraining(User user, int trainingId) {
+        List<Training> trainings = this.trainings.get(user);
         trainings.remove(trainingId);
     }
 }

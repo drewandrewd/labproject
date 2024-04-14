@@ -73,7 +73,29 @@ public class UserController {
         return this.user != null;
     }
 
+    /**
+     * Присвоение пользователя контроллеру
+     * @param user пользователь
+     */
     public void setCurrentUser(User user) {
         this.user = user;
+    }
+
+    /**
+     * Печать всех рользователей в консоль
+     */
+    public void printUsers() {
+        userRepository.getAllUsers().keySet().forEach(System.out::println);
+    }
+
+    /**
+     * Получение пользователя по username
+     * @param username имя пользователя
+     */
+    public User getUserByUsername(String username) {
+        return userRepository.getAllUsers().values().stream()
+                .filter(user -> user.getName().equals(username))
+                .findFirst()
+                .orElse(null);
     }
 }

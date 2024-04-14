@@ -1,10 +1,12 @@
 import org.example.model.User;
 import org.example.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("Тесты класса UserRepository")
 public class UserRepositoryTest {
 
     private UserRepository userRepository;
@@ -17,6 +19,7 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Регистрация пользователя")
     void register_AddUserToRepository() {
         userRepository.register(testUser);
         assertTrue(userRepository.getAllUsers().containsKey("testUser"));
@@ -24,6 +27,7 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Вход пользователя")
     void login_ReturnUserIfExists() {
         userRepository.register(testUser);
         User loggedInUser = userRepository.login("testUser", "password");
@@ -32,12 +36,14 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Вход пользователя (пользователь не существует)")
     void login_IfUserDoesNotExist() {
         User loggedInUser = userRepository.login("nonExistingUser", "password");
         assertNull(loggedInUser);
     }
 
     @Test
+    @DisplayName("Вход пользователя (неправильный пароль)")
     void login_IfPasswordIncorrect() {
         userRepository.register(testUser);
         User loggedInUser = userRepository.login("testUser", "wrongPassword");

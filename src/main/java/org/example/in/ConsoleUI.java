@@ -1,6 +1,7 @@
 package org.example.in;
 
 import org.example.model.Training;
+import org.example.model.User;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -57,6 +58,9 @@ public class ConsoleUI {
                 case "9":
                     running = false;
                     break;
+                case "10":
+                    adminManagingTrainings();
+                    break;
                 default:
                     System.out.println("Неправильный ввод");
             }
@@ -77,6 +81,9 @@ public class ConsoleUI {
         System.out.println("7. Удалить тренировку");
         System.out.println("8. Выход из учетки");
         System.out.println("9. Завершить работу приложения");
+        if (userController.isAdmin()) {
+            System.out.println("10. Управление тренировками пользователей:");
+        }
         System.out.print("Введите номер пункта меню: ");
     }
 
@@ -117,7 +124,7 @@ public class ConsoleUI {
             scanner.nextLine();
             String additionalInformation = scanner.nextLine();
             System.out.print("Введите дату и время тренировки (HH:MM DD-MM-YYYY): ");
-            LocalDateTime dateTime = LocalDateTime.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"));
+            String dateTime = scanner.nextLine();
             trainingController.addTraining(type, durationMinutes, caloriesBurned, additionalInformation, dateTime);
         } else {
             System.out.println("Войдите в учетную запись");
@@ -128,7 +135,7 @@ public class ConsoleUI {
      * Метод для просмотра всех тренировок пользователя.
      */
     private void viewTrainings() {
-        trainingController.viewTrainings();
+        trainingController.viewTrainings(userController.getUser());
     }
 
     /**
@@ -137,10 +144,7 @@ public class ConsoleUI {
     private void editTraining() {
         if (userController.isLoggedIn()) {
             System.out.println("Ваши тренировки:");
-            List<Training> userTrainings = trainingController.getUserTrainings();
-            for (int i = 0; i < userTrainings.size(); i++) {
-                System.out.println(i + ". " + userTrainings.get(i));
-            }
+            trainingController.printUserTrainings(userController.getUser());
             System.out.print("Введите номер тренировки для редактирования: ");
             int id = scanner.nextInt();
             scanner.nextLine();
@@ -154,7 +158,7 @@ public class ConsoleUI {
             scanner.nextLine();
             String additionalInformation = scanner.nextLine();
             System.out.print("Новая дата и время тренировки (HH:MM DD-MM-YYYY): ");
-            LocalDateTime dateTime = LocalDateTime.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"));
+            String dateTime = scanner.nextLine();
             trainingController.editTraining(id, type, durationMinutes, caloriesBurned, additionalInformation, dateTime);
         } else {
             System.out.println("Войдите в учетную запись");
@@ -167,14 +171,11 @@ public class ConsoleUI {
     private void deleteTraining() {
         if (userController.isLoggedIn()) {
             System.out.println("Ваши тренировки:");
-            List<Training> userTrainings = trainingController.getUserTrainings();
-            for (int i = 0; i < userTrainings.size(); i++) {
-                System.out.println(i + ". " + userTrainings.get(i));
-            }
+            trainingController.printUserTrainings(userController.getUser());
             System.out.print("Введите номер тренировки для удаления: ");
             int index = scanner.nextInt();
             scanner.nextLine();
-            trainingController.deleteTraining(index);
+            trainingController.deleteTraining(userController.getUser(), index);
         } else {
             System.out.println("Войдите в учетную запись");
         }
@@ -189,7 +190,7 @@ public class ConsoleUI {
 
     /**
      * Отображает статистику по тренировкам текущего пользователя.
-     */
+     */ 
     private void viewStatistics() {
         if (userController.isLoggedIn()) {
             double averageCaloriesPerMinute = trainingController.getAverageCaloriesPerMinute();
@@ -197,6 +198,14 @@ public class ConsoleUI {
         } else {
             System.out.println("Войдите в учетную запись");
         }
+    }
+
+    /**
+     * Вызывает консольное меню для админа
+     */
+    private void adminManagingTrainings() {
+        AdminConsole adminConsole = new AdminConsole(userController, trainingController, scanner);
+        adminConsole.start();
     }
 }
 
