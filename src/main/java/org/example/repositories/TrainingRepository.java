@@ -4,10 +4,7 @@ import org.example.model.Training;
 import org.example.model.User;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Класс TrainingRepository отвечает за хранение и управление данными тренировок.
@@ -44,9 +41,7 @@ public class TrainingRepository {
      * @return Список тренировок пользователей
      */
     public List<Training> getAllTrainings() {
-        List<Training> allTrainings = new ArrayList<>();
-        trainings.values().forEach(allTrainings::addAll);
-        return allTrainings;
+        return trainings.values().stream().flatMap(Collection::stream).toList();
     }
 
     /**

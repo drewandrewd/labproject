@@ -1,24 +1,21 @@
-package org.example.in;
+package org.example.service;
 
 import lombok.Data;
 import org.example.model.User;
 import org.example.repositories.AuditRepository;
 import org.example.repositories.UserRepository;
 
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * Класс UserController управляет операциями с пользователями в системе.
  */
 @Data
-public class UserController {
+public class UserService {
 
     private final UserRepository userRepository;
     private final AuditRepository auditRepository;
     private User user;
 
-    public UserController() {
+    public UserService() {
         this.userRepository = new UserRepository();
         this.user = null;
         this.auditRepository = new AuditRepository();

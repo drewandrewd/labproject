@@ -1,5 +1,5 @@
-import org.example.in.TrainingController;
-import org.example.in.UserController;
+import org.example.service.TrainingService;
+import org.example.service.UserService;
 import org.example.model.Training;
 import org.example.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,17 +11,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Тесты класса TrainingController")
-public class TrainingControllerTest {
+public class TrainingServiceTest {
 
-    private TrainingController trainingController;
-    private UserController userController;
+    private TrainingService trainingService;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
-        userController = new UserController();
-        trainingController = new TrainingController(userController);
-        userController.register("testUser", "password");
-        userController.login("testUser", "password");
+        userService = new UserService();
+        trainingService = new TrainingService(userService);
+        userService.register("testUser", "password");
+        userService.login("testUser", "password");
     }
 
     @Test
@@ -32,8 +32,8 @@ public class TrainingControllerTest {
         int durationMinutes = 30;
         int burnedCalories = 200;
         String additionalInformation = "Утро";
-        trainingController.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime);
-        List<Training> userTrainings = trainingController.getTrainingRepository().getAllTrainings();
+        trainingService.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime);
+        List<Training> userTrainings = trainingService.getTrainingRepository().getAllTrainings();
         assertFalse(userTrainings.isEmpty());
     }
 
@@ -45,9 +45,9 @@ public class TrainingControllerTest {
         int durationMinutes = 30;
         int burnedCalories = 200;
         String additionalInformation = "Утро";
-        trainingController.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime);
-        trainingController.editTraining(0, "Плаванье", 45, 300, "Вечер", dateTime);
-        List<Training> trainings = trainingController.getTrainingRepository().getAllTrainings();
+        trainingService.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime);
+        trainingService.editTraining(0, "Плаванье", 45, 300, "Вечер", dateTime);
+        List<Training> trainings = trainingService.getTrainingRepository().getAllTrainings();
         assertEquals("Плаванье", trainings.get(0).getType());
     }
 
@@ -59,9 +59,9 @@ public class TrainingControllerTest {
         int durationMinutes = 30;
         int burnedCalories = 200;
         String additionalInformation = "Утро";
-        trainingController.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime);
-        trainingController.deleteTraining(userController.getUser(), 0);
-        List<Training> trainings = trainingController.getTrainingRepository().getAllTrainings();
+        trainingService.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime);
+        trainingService.deleteTraining(userService.getUser(), 0);
+        List<Training> trainings = trainingService.getTrainingRepository().getAllTrainings();
         assertTrue(trainings.isEmpty());
     }
 
@@ -74,17 +74,17 @@ public class TrainingControllerTest {
         int durationMinutes = 30;
         int burnedCalories = 200;
         String additionalInformation = "Утро";
-        trainingController.getUserController().setCurrentUser(user);
-        trainingController.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime);
-        List<Training> userTrainings = trainingController.getUserTrainings(user);
+        trainingService.getUserService().setCurrentUser(user);
+        trainingService.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime);
+        List<Training> userTrainings = trainingService.getUserTrainings(user);
         assertFalse(userTrainings.isEmpty());
     }
 
     @Test
     @DisplayName("Получение среднего количества калорий в минуту")
     void getAverageCaloriesPerMinute_shouldReturnZeroIfNoTrainings() {
-        userController.setCurrentUser(new User("testUser", "password"));
-        double avgCaloriesPerMinute = trainingController.getAverageCaloriesPerMinute();
+        userService.setCurrentUser(new User("testUser", "password"));
+        double avgCaloriesPerMinute = trainingService.getAverageCaloriesPerMinute();
         assertEquals(0, avgCaloriesPerMinute);
     }
 }

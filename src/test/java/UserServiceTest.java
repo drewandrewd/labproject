@@ -1,7 +1,5 @@
-import org.example.in.UserController;
-import org.example.repositories.AuditRepository;
+import org.example.service.UserService;
 import org.example.model.User;
-import org.example.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,21 +7,21 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Тесты класса UserController")
-public class UserControllerTest {
+public class UserServiceTest {
 
 
-    private UserController userController;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
-        userController = new UserController();
+        userService = new UserService();
     }
 
     @Test
     @DisplayName("Регистрация пользователя")
     void register_shouldAddUserToRepository() {
-        userController.register("testUser", "password");
-        User user = userController.getUserRepository().login("testUser", "password");
+        userService.register("testUser", "password");
+        User user = userService.getUserRepository().login("testUser", "password");
         assertNotNull(user);
         assertEquals("testUser", user.getName());
     }
@@ -31,26 +29,26 @@ public class UserControllerTest {
     @Test
     @DisplayName("Аутентификация пользователя")
     void login_shouldAuthenticateUser() {
-        userController.register("testUser", "password");
-        userController.login("testUser", "password");
-        assertTrue(userController.isLoggedIn());
+        userService.register("testUser", "password");
+        userService.login("testUser", "password");
+        assertTrue(userService.isLoggedIn());
     }
 
     @Test
     @DisplayName("Аутентификация пользователя (неверные учетные данные)")
     void login_shouldNotAuthenticateUserWithInvalidCredentials() {
-        userController.register("testUser", "password");
-        userController.login("testUser", "wrongPassword");
-        assertFalse(userController.isLoggedIn());
+        userService.register("testUser", "password");
+        userService.login("testUser", "wrongPassword");
+        assertFalse(userService.isLoggedIn());
     }
 
     @Test
     @DisplayName("Выход пользователя")
     void logout_shouldLogoutUser() {
-        userController.register("testUser", "password");
-        userController.login("testUser", "password");
-        userController.logout();
-        assertFalse(userController.isLoggedIn());
+        userService.register("testUser", "password");
+        userService.login("testUser", "password");
+        userService.logout();
+        assertFalse(userService.isLoggedIn());
     }
 
     @Test
@@ -58,10 +56,10 @@ public class UserControllerTest {
     void isAdmin_shouldReturnTrueForAdminUser() {
         User adminUser = new User("admin", "adminPassword");
         adminUser.setAdmin(true);
-        userController.getUserRepository().register(adminUser);
-        userController.login("admin", "adminPassword");
-        System.out.println(userController.getUserRepository().getAllUsers());
-        assertTrue(userController.isAdmin());
+        userService.getUserRepository().register(adminUser);
+        userService.login("admin", "adminPassword");
+        System.out.println(userService.getUserRepository().getAllUsers());
+        assertTrue(userService.isAdmin());
     }
 
 }

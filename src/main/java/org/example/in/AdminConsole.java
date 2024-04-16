@@ -1,17 +1,19 @@
 package org.example.in;
 
 import org.example.model.User;
+import org.example.service.TrainingService;
+import org.example.service.UserService;
 
 import java.util.Scanner;
 
 public class AdminConsole {
-    private final UserController userController;
-    private final TrainingController trainingController;
+    private final UserService userService;
+    private final TrainingService trainingService;
     private final Scanner scanner;
 
-    public AdminConsole(UserController userController, TrainingController trainingController, Scanner scanner) {
-        this.userController = userController;
-        this.trainingController = trainingController;
+    public AdminConsole(UserService userService, TrainingService trainingService, Scanner scanner) {
+        this.userService = userService;
+        this.trainingService = trainingService;
         this.scanner = scanner;
     }
 
@@ -20,14 +22,14 @@ public class AdminConsole {
      */
     public void start() {
         System.out.println("Все пользователи:");
-        userController.printUsers();
+        userService.printUsers();
         System.out.print("Выберите пользователя: ");
         String username = scanner.nextLine();
-        User user = userController.getUserByUsername(username);
+        User user = userService.getUserByUsername(username);
         if (user != null) {
             System.out.println("Выбранный пользователь: " + username);
             System.out.println("Тренировки выбранного пользователя:");
-            trainingController.printUserTrainings(user);
+            trainingService.printUserTrainings(user);
             System.out.println("Выберите действие:");
             System.out.println("1. Редактировать тренировку");
             System.out.println("2. Удалить тренировку");
@@ -55,7 +57,7 @@ public class AdminConsole {
      */
     private void editTraining(User user) {
         System.out.println("Тренировки пользователя " + user.getName() + " :");
-        trainingController.printUserTrainings(user);
+        trainingService.printUserTrainings(user);
         System.out.print("Введите номер тренировки для редактирования: ");
         int id = scanner.nextInt();
         scanner.nextLine();
@@ -70,7 +72,7 @@ public class AdminConsole {
         String additionalInformation = scanner.nextLine();
         System.out.print("Новая дата и время тренировки (HH:MM DD-MM-YYYY): ");
         String dateTime = scanner.nextLine();
-        trainingController.editTraining(id, type, durationMinutes, caloriesBurned, additionalInformation, dateTime);
+        trainingService.editTraining(id, type, durationMinutes, caloriesBurned, additionalInformation, dateTime);
     }
 
     /**
@@ -79,10 +81,10 @@ public class AdminConsole {
      */
     private void deleteTraining(User user) {
         System.out.println("Тренировки пользователя " + user.getName() + " :");
-        trainingController.printUserTrainings(user);
+        trainingService.printUserTrainings(user);
         System.out.print("Введите номер тренировки для удаления: ");
         int index = scanner.nextInt();
         scanner.nextLine();
-        trainingController.deleteTraining(userController.getUser(), index);
+        trainingService.deleteTraining(userService.getUser(), index);
     }
 }

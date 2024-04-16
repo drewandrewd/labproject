@@ -1,11 +1,10 @@
-package org.example.in;
+package org.example.service;
 
 import lombok.Data;
 import lombok.Setter;
 import org.example.model.Training;
 import org.example.model.User;
 import org.example.repositories.TrainingRepository;
-import org.example.repositories.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,14 +16,14 @@ import java.util.List;
  */
 @Data
 @Setter
-public class TrainingController {
+public class TrainingService {
 
     private final TrainingRepository trainingRepository;
-    private final UserController userController;
+    private final UserService userService;
 
-    public TrainingController(UserController userController) {
+    public TrainingService(UserService userService) {
         this.trainingRepository = new TrainingRepository();
-        this.userController = userController;
+        this.userService = userService;
     }
 
     /**
@@ -37,10 +36,10 @@ public class TrainingController {
      */
     public void addTraining(String trainingType, int durationMinutes, int burnedCalories, String additionalInformation, String date) {
         LocalDateTime dateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"));
-        Training training = new Training(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime, userController.getUser());
+        Training training = new Training(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime, userService.getUser());
         trainingRepository.addTraining(training);
         System.out.printf("Тренировка %s добавлена\n", trainingType);
-        userController.getAuditRepository().logTrainingAdded(userController.getUser().getName(), trainingType);
+        userService.getAuditRepository().logTrainingAdded(userService.getUser().getName(), trainingType);
     }
 
     /**
@@ -68,9 +67,9 @@ public class TrainingController {
      */
     public void editTraining(int trainingId, String type, int durationMinutes, int burnedCalories, String additionalInformation, String date) {
             LocalDateTime dateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"));
-            trainingRepository.editTraining(userController.getUser(), trainingId, type, durationMinutes, burnedCalories, additionalInformation, dateTime);
+            trainingRepository.editTraining(userService.getUser(), trainingId, type, durationMinutes, burnedCalories, additionalInformation, dateTime);
             System.out.println("Тренировка пользователя отредактирована.");
-            userController.getAuditRepository().logTrainingEdited(userController.getUser().getName(), type);
+            userService.getAuditRepository().logTrainingEdited(userService.getUser().getName(), type);
     }
 
     /**
@@ -78,7 +77,7 @@ public class TrainingController {
      * @param trainingId id тренировки.
      */
     public void deleteTraining(User user, int trainingId) {
-            userController.getAuditRepository().logTrainingAdded(user.getName(), trainingRepository.getUserTrainings(user).get(trainingId).getType());
+            userService.getAuditRepository().logTrainingAdded(user.getName(), trainingRepository.getUserTrainings(user).get(trainingId).getType());
             trainingRepository.deleteTraining(user, trainingId);
             System.out.println("Тренировка удалена.");
     }
@@ -96,13 +95,13 @@ public class TrainingController {
      * @return возврвщвет список тренировок.
      */
     public double getAverageCaloriesPerMinute() {
-        List<Training> userTrainings = trainingRepository.getUserTrainings(userController.getUser());
+        List<Training> userTrainings = trainingRepository.getUserTrainings(userService.getUser());
         if (userTrainings.isEmpty()) {
             return 0;
         }
         int totalCalories = userTrainings.stream().mapToInt(Training::getBurnedCalories).sum();
         int totalDuration = userTrainings.stream().mapToInt(Training::getDurationMinutes).sum();
-        userController.getAuditRepository().logStatisticsViewed(userController.getUser().getName());
+        userService.getAuditRepository().logStatisticsViewed(userService.getUser().getName());
         return (double) totalCalories / totalDuration;
     }
 
