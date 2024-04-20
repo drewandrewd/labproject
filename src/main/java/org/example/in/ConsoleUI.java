@@ -14,7 +14,7 @@ public class ConsoleUI {
     private final Scanner scanner;
 
     public ConsoleUI() {
-        this.userService = new UserService();
+        this.userService = UserService.getInstance();
         this.trainingService = new TrainingService(userService);
         this.scanner = new Scanner(System.in);
     }
@@ -170,9 +170,9 @@ public class ConsoleUI {
             System.out.println("Ваши тренировки:");
             trainingService.printUserTrainings(userService.getUser());
             System.out.print("Введите номер тренировки для удаления: ");
-            int index = scanner.nextInt();
+            long index = scanner.nextLong();
             scanner.nextLine();
-            trainingService.deleteTraining(userService.getUser(), index);
+            trainingService.deleteTraining(index);
         } else {
             System.out.println("Войдите в учетную запись");
         }

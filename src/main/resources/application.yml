@@ -1,0 +1,7 @@
+database:
+  url: jdbc:postgresql://localhost:5433/postgres?currentSchema=my_schema
+  username: postgres
+  password: password
+  liquibaseChangeLog: classpath:db.changelog/changelog.xml
+
+
