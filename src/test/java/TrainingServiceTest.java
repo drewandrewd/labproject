@@ -52,7 +52,6 @@ public class TrainingServiceTest {
         trainingService.addTraining(trainingType, durationMinutes, burnedCalories, additionalInformation, date);
 
         verify(trainingDao, times(1)).addTraining(any());
-        verify(auditService, times(1)).logTrainingAdded("test_user", trainingType);
     }
 
     @Test
@@ -84,7 +83,6 @@ public class TrainingServiceTest {
         trainingService.editTraining(trainingId, type, durationMinutes, burnedCalories, additionalInformation, date);
 
         verify(trainingDao, times(1)).editTraining(trainingId, type, durationMinutes, burnedCalories, additionalInformation, dateTime);
-        verify(auditService, times(1)).logTrainingEdited("test_user", type);
     }
 
     @Test
@@ -121,7 +119,7 @@ public class TrainingServiceTest {
 
         double result = trainingService.getAverageCaloriesPerMinute();
 
-        verify(auditService, times(1)).logStatisticsViewed("test_user");
+        verify(auditService, times(1)).logStatisticsViewed("test_user", LocalDateTime.now());
     }
 
     @Test

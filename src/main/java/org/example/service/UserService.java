@@ -5,6 +5,8 @@ import org.example.dao.AuditDao;
 import org.example.dao.UserDao;
 import org.example.model.User;
 
+import java.time.LocalDateTime;
+
 /**
  * Класс UserService управляет операциями с пользователями в системе.
  */
@@ -43,7 +45,7 @@ public class UserService {
     public void register(String userName, String password) {
         User user = new User(userName, password);
         userDao.register(user);
-        auditService.logAuthentication(userName, true);
+        auditService.logAuthentication(userName, true, LocalDateTime.now());
     }
 
     /**
@@ -57,10 +59,10 @@ public class UserService {
         if (user != null) {
             setUser(user);
             System.out.println("Вход выполнен успешно");
-            auditService.logAuthentication(userName, true);
+            auditService.logAuthentication(userName, true, LocalDateTime.now());
         } else {
             System.out.println("Неправильный логин или пароль");
-            auditService.logAuthentication(userName, false);
+            auditService.logAuthentication(userName, false, LocalDateTime.now());
         }
     }
 

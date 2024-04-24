@@ -36,9 +36,9 @@ public class AuditService {
      * @param username имя пользователя
      * @param success  успешна ли попытка авторизации
      */
-    public void logAuthentication(String username, boolean success) {
+    public void logAuthentication(String username, boolean success, LocalDateTime localDateTime) {
         String action = "Авторизация - Логин: " + username + ", Success: " + success;
-        Audit audit = new Audit(username, action, LocalDateTime.now());
+        Audit audit = new Audit(username, action, localDateTime);
         auditDao.logEvent(audit);
     }
 
@@ -48,9 +48,9 @@ public class AuditService {
      * @param username имя пользователя
      * @param trainingType тип тренировки
      */
-    public void logTrainingAdded(String username, String trainingType) {
+    public void logTrainingAdded(String username, String trainingType, LocalDateTime localDateTime) {
         String action = "Тренировка добавлена - Логин: " + username + ", Тип: " + trainingType;
-        Audit audit = new Audit(username, action, LocalDateTime.now());
+        Audit audit = new Audit(username, action, localDateTime);
         auditDao.logEvent(audit);
     }
 
@@ -60,9 +60,9 @@ public class AuditService {
      * @param username имя пользователя
      * @param trainingType тип тренировки
      */
-    public void logTrainingEdited(String username, String trainingType) {
+    public void logTrainingEdited(String username, String trainingType, LocalDateTime localDateTime) {
         String action = "Тренировка отредактирована - Логин: " + username + ", Тип: " + trainingType;
-        Audit audit = new Audit(username, action, LocalDateTime.now());
+        Audit audit = new Audit(username, action, localDateTime);
         auditDao.logEvent(audit);
     }
 
@@ -72,9 +72,9 @@ public class AuditService {
      * @param username имя пользователя
      * @param trainingType тип тренировки
      */
-    public void logTrainingDeleted(String username, String trainingType) {
+    public void logTrainingDeleted(String username, String trainingType, LocalDateTime localDateTime) {
         String action = "Тренировка удалена - Логин: " + username + ", Тип: " + trainingType;
-        Audit audit = new Audit(username, action, LocalDateTime.now());
+        Audit audit = new Audit(username, action, localDateTime);
         auditDao.logEvent(audit);
     }
 
@@ -83,9 +83,9 @@ public class AuditService {
      *
      * @param username имя пользователя
      */
-    public void logStatisticsViewed(String username) {
+    public void logStatisticsViewed(String username, LocalDateTime localDateTime) {
         String action = "Просмотр статистики - Логин: " + username;
-        Audit audit = new Audit(username, action, LocalDateTime.now());
+        Audit audit = new Audit(username, action, localDateTime);
         auditDao.logEvent(audit);
     }
 }

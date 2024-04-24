@@ -31,7 +31,7 @@ public class AuditServiceTest {
         LocalDateTime timestamp = LocalDateTime.of(2024, 4, 20, 8, 0);
         Audit audit = new Audit(username, expectedAction, timestamp);
 
-        auditService.logAuthentication(username, success);
+        auditService.logAuthentication(username, success, timestamp);
 
         verify(auditDao).logEvent(audit);
     }
@@ -44,7 +44,7 @@ public class AuditServiceTest {
         LocalDateTime timestamp = LocalDateTime.of(2024, 4, 20, 8, 0);
         Audit audit = new Audit(username, expectedAction, timestamp);
 
-        auditService.logTrainingAdded(username, trainingType);
+        auditService.logTrainingAdded(username, trainingType, timestamp);
 
         verify(auditDao).logEvent(audit);
     }
@@ -57,7 +57,7 @@ public class AuditServiceTest {
         LocalDateTime timestamp = LocalDateTime.of(2024, 4, 20, 8, 0);
         Audit audit = new Audit(username, expectedAction, timestamp);
 
-        auditService.logTrainingEdited(username, trainingType);
+        auditService.logTrainingEdited(username, trainingType, timestamp);
 
         verify(auditDao).logEvent(audit);
     }
@@ -70,7 +70,7 @@ public class AuditServiceTest {
         LocalDateTime timestamp = LocalDateTime.of(2024, 4, 20, 8, 0);
         Audit audit = new Audit(username, expectedAction, timestamp);
 
-        auditService.logTrainingDeleted(username, trainingType);
+        auditService.logTrainingDeleted(username, trainingType, timestamp);
 
         verify(auditDao).logEvent(audit);
     }
@@ -82,9 +82,8 @@ public class AuditServiceTest {
         LocalDateTime timestamp = LocalDateTime.of(2024, 4, 20, 8, 0);
         Audit audit = new Audit(username, expectedAction, timestamp);
 
-        auditService.logStatisticsViewed(username);
+        auditService.logStatisticsViewed(username, timestamp);
 
         verify(auditDao).logEvent(audit);
     }
 }
-

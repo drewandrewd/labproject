@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 public class LiquibaseConfig {
 
-    private static final String CHANGELOG_FILE = "db.changelog/changelog.xml";
+    private static final String CHANGELOG_FILE = DatabaseConfig.getLiquibaseChangeLog();
 
     public static void runMigrations() {
         try (Database database = DatabaseFactory.getInstance()

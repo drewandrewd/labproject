@@ -1,11 +1,8 @@
 import org.example.config.DatabaseConfig;
 import org.example.dao.AuditDao;
 import org.example.model.Audit;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.GenericContainer;
+import org.junit.jupiter.api.*;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -22,26 +19,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AuditDaoTest {
 
     @Container
-    private static final GenericContainer<?> databaseContainer = new GenericContainer<>("postgres:latest")
-            .withExposedPorts(5432)
-            .withEnv("POSTGRES_DB", "test")
-            .withEnv("POSTGRES_USER", "test")
-            .withEnv("POSTGRES_PASSWORD", "test");
+    private static final PostgreSQLContainer<?> databaseContainer = new PostgreSQLContainer<>("postgres:latest")
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("test");
 
     private static AuditDao auditDao;
 
     @BeforeAll
     static void setUp() throws SQLException {
-        databaseContainer.start();
-        String jdbcUrl = "jdbc:postgresql://" + databaseContainer.getHost() + ":" + databaseContainer.getFirstMappedPort() + "/test";
+        String jdbcUrl = databaseContainer.getJdbcUrl();
         DatabaseConfig.setConnectionConfig(jdbcUrl, "test", "test");
         auditDao = new AuditDao();
         createAuditTable();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        databaseContainer.stop();
     }
 
     private static void createAuditTable() throws SQLException {

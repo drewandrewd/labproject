@@ -48,7 +48,7 @@ public class TrainingService {
         Training training = new Training(trainingType, durationMinutes, burnedCalories, additionalInformation, dateTime, userService.getUser());
         trainingDao.addTraining(training);
         System.out.printf("Тренировка %s добавлена\n", trainingType);
-        auditService.logTrainingAdded(userService.getUser().getName(), trainingType);
+        auditService.logTrainingAdded(userService.getUser().getName(), trainingType, LocalDateTime.now());
     }
 
     /**
@@ -80,7 +80,7 @@ public class TrainingService {
         LocalDateTime dateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"));
         trainingDao.editTraining(trainingId, type, durationMinutes, burnedCalories, additionalInformation, dateTime);
         System.out.println("Тренировка пользователя отредактирована.");
-        auditService.logTrainingEdited(userService.getUser().getName(), type);
+        auditService.logTrainingEdited(userService.getUser().getName(), type, LocalDateTime.now());
     }
 
     /**
@@ -115,7 +115,7 @@ public class TrainingService {
         }
         int totalCalories = userTrainings.stream().mapToInt(Training::getBurnedCalories).sum();
         int totalDuration = userTrainings.stream().mapToInt(Training::getDurationMinutes).sum();
-        auditService.logStatisticsViewed(userService.getUser().getName());
+        auditService.logStatisticsViewed(userService.getUser().getName(), LocalDateTime.now());
         return (double) totalCalories / totalDuration;
     }
 

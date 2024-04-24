@@ -2,7 +2,7 @@ import org.example.config.DatabaseConfig;
 import org.example.dao.UserDao;
 import org.example.model.User;
 import org.junit.jupiter.api.*;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -11,36 +11,25 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserDaoTest {
 
     @Container
-    private static final GenericContainer<?> databaseContainer = new GenericContainer<>("postgres:latest")
-            .withExposedPorts(5432)
-            .withEnv("POSTGRES_DB", "test")
-            .withEnv("POSTGRES_USER", "test")
-            .withEnv("POSTGRES_PASSWORD", "test");
+    private static final PostgreSQLContainer<?> databaseContainer = new PostgreSQLContainer<>("postgres:latest")
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("test");
 
     private static UserDao userDao;
 
     @BeforeAll
     static void setUp() throws SQLException {
-        databaseContainer.start();
-        DatabaseConfig.setConnectionConfig(getJdbcUrl(), "test", "test");
+        String jdbcUrl = databaseContainer.getJdbcUrl();
+        DatabaseConfig.setConnectionConfig(jdbcUrl, "test", "test");
         userDao = new UserDao();
         createUsersTable();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        databaseContainer.stop();
-    }
-
-    private static String getJdbcUrl() {
-        return "jdbc:postgresql://localhost:" + databaseContainer.getMappedPort(5432) + "/test?currentSchema=public";
     }
 
     private static void createUsersTable() throws SQLException {
@@ -54,8 +43,19 @@ public class UserDaoTest {
         }
     }
 
+    @BeforeEach
+    void setUpEach() throws SQLException {
+        clearUsersTable();
+    }
+
+    private static void clearUsersTable() throws SQLException {
+        try (Connection connection = DatabaseConfig.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate("DELETE FROM users");
+        }
+    }
+
     @Test
-    @Order(1)
     void registerUser() {
         User user = new User();
         user.setName("test_user");
@@ -68,23 +68,38 @@ public class UserDaoTest {
     }
 
     @Test
-    @Order(2)
     void login() {
-        User user = userDao.login("test_user", "password");
-        assertNotNull(user);
+        User user = new User();
+        user.setName("test_user");
+        user.setPassword("password");
+
+        userDao.register(user);
+
+        User loggedInUser = userDao.login("test_user", "password");
+        assertNotNull(loggedInUser);
     }
 
     @Test
-    @Order(3)
     void getAllUsers() {
+        User user = new User();
+        user.setName("test_user");
+        user.setPassword("password");
+
+        userDao.register(user);
+
         List<User> users = userDao.getAllUsers();
         assertEquals(1, users.size());
     }
 
     @Test
-    @Order(4)
     void getUserByUsername() {
-        User user = userDao.getUserByUsername("test_user");
-        assertNotNull(user);
+        User user = new User();
+        user.setName("test_user");
+        user.setPassword("password");
+
+        userDao.register(user);
+
+        User retrievedUser = userDao.getUserByUsername("test_user");
+        assertNotNull(retrievedUser);
     }
 }

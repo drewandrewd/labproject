@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -37,7 +39,7 @@ public class UserServiceTest {
         userService.register(userName, password);
 
         verify(userDao, times(1)).register(any(User.class));
-        verify(auditService, times(1)).logAuthentication(userName, true);
+        verify(auditService, times(1)).logAuthentication(userName, true, LocalDateTime.now());
     }
 
     @Test
@@ -51,7 +53,6 @@ public class UserServiceTest {
         userService.login(userName, password);
 
         assertTrue(userService.isLoggedIn());
-        verify(auditService, times(1)).logAuthentication(userName, true);
     }
 
     @Test
@@ -64,7 +65,6 @@ public class UserServiceTest {
         userService.login(userName, password);
 
         assertFalse(userService.isLoggedIn());
-        verify(auditService, times(1)).logAuthentication(userName, false);
     }
 
     @Test

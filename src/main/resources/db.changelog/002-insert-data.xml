@@ -5,6 +5,11 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
 
     <changeSet id="insert-data-users" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">SELECT COUNT(*) FROM my_schema.users WHERE id IN (10000, 20000, 30000)</sqlCheck>
+            </not>
+        </preConditions>
         <insert schemaName="my_schema" tableName="users">
             <column name="id" valueNumeric="10000"/>
             <column name="username" value="user1"/>
@@ -23,6 +28,11 @@
     </changeSet>
 
     <changeSet id="insert-data-trainings" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">SELECT COUNT(*) FROM my_schema.trainings WHERE id IN (1000, 2000, 3000)</sqlCheck>
+            </not>
+        </preConditions>
         <insert schemaName="my_schema" tableName="trainings">
             <column name="id" valueNumeric="1000"/>
             <column name="type" value="Бег"/>
