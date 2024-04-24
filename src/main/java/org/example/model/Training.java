@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Data
 public class Training {
 
+    private Long id;
     private String type;
     private int durationMinutes;
     private int burnedCalories;
@@ -25,5 +26,8 @@ public class Training {
         this.dateTime = dateTime;
         this.additionalInformation = additionalInformation;
         this.user = user;
+    }
+
+    public Training() {
     }
 }

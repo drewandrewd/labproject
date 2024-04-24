@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="create-schema-my_schema" author="author">
+        <sql>
+            CREATE SCHEMA IF NOT EXISTS my_schema;
+        </sql>
+    </changeSet>
+
+    <changeSet id="create-sequence-users" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="my_schema.users_id_seq"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="users_id_seq"
+                        startValue="1"
+                        incrementBy="1"
+                        minValue="1"
+                        maxValue="9223372036854775807"
+                        cycle="false"/>
+        <rollback>
+            <dropSequence sequenceName="my_schema.users_id_seq"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-sequence-trainings" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="my_schema.trainings_id_seq"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="trainings_id_seq"
+                        startValue="1"
+                        incrementBy="1"
+                        minValue="1"
+                        maxValue="9223372036854775807"
+                        cycle="false"/>
+        <rollback>
+            <dropSequence sequenceName="my_schema.trainings_id_seq"/>
+        </rollback>
+    </changeSet>
+
+
+
+    <changeSet id="create-table-users" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        <createTable schemaName="my_schema" tableName="users">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="my_schema" tableName="users"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-table-trainings" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="trainings"/>
+            </not>
+        </preConditions>
+        <createTable schemaName="my_schema" tableName="trainings">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_minutes" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="calories_burned" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="additional_information" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="datetime" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints references="my_schema.users(id)" foreignKeyName="fk_trainings_users"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="my_schema" tableName="trainings"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-audit-table" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="audit"/>
+            </not>
+        </preConditions>
+        <createTable tableName="audit">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="action" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="audit"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="add-auto-increment-to-audit-id" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="my_schema.users" columnName="id"/>
+            </not>
+        </preConditions>
+        <addAutoIncrement
+                columnName="id"
+                columnDataType="BIGINT"
+                incrementBy="1"
+                tableName="audit"
+                schemaName="my_schema"/>
+        <rollback>
+            <dropColumn columnName="id" tableName="audit"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="author" id="addAutoIncrementToUsersId">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="my_schema.trainings" columnName="id"/>
+            </not>
+        </preConditions>
+        <addAutoIncrement
+                columnName="id"
+                columnDataType="BIGINT"
+                incrementBy="1"
+                tableName="users"
+                schemaName="my_schema"/>
+        <rollback>
+            <dropColumn columnName="id" tableName="users"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="author" id="addAutoIncrementToTrainingsId">
+        <addAutoIncrement
+                columnName="id"
+                columnDataType="BIGINT"
+                incrementBy="1"
+                tableName="trainings"
+                schemaName="my_schema"/>
+        <rollback>
+            <dropColumn columnName="id" tableName="trainings"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-schema-liquibase" author="author">
+        <sql>
+            CREATE SCHEMA IF NOT EXISTS liquibase;
+        </sql>
+    </changeSet>
+
+    <changeSet id="create-table-databasechangelog" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="databasechangelog"/>
+            </not>
+        </preConditions>
+        <createTable schemaName="liquibase" tableName="databasechangelog">
+            <column name="ID" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="AUTHOR" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="FILENAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATEEXECUTED" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORDEREXECUTED" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXECTYPE" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MD5SUM" type="VARCHAR(35)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="COMMENTS" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="TAG" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="LIQUIBASE" type="VARCHAR(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="CONTEXTS" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="LABELS" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="liquibase" tableName="databasechangelog"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-table-databasechangeloglock" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="databasechangeloglock"/>
+            </not>
+        </preConditions>
+        <createTable schemaName="liquibase" tableName="databasechangeloglock">
+            <column name="ID" type="INT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="LOCKED" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LOCKGRANTED" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="LOCKEDBY" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="liquibase" tableName="databasechangeloglock"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="liquibase-docs" id="addAutoIncrementToUsersId">
+        <addAutoIncrement
+                columnName="id"
+                columnDataType="BIGINT"
+                incrementBy="1"
+                tableName="users"
+                schemaName="my_schema"/>
+    </changeSet>
+
+</databaseChangeLog>

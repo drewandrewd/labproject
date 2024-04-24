@@ -58,8 +58,8 @@ public class AdminConsole {
     private void editTraining(User user) {
         System.out.println("Тренировки пользователя " + user.getName() + " :");
         trainingService.printUserTrainings(user);
-        System.out.print("Введите номер тренировки для редактирования: ");
-        int id = scanner.nextInt();
+        System.out.print("Введите id тренировки для редактирования: ");
+        long id = scanner.nextLong();
         scanner.nextLine();
         System.out.print("Новый Тип тренировки: ");
         String type = scanner.nextLine();
@@ -82,9 +82,9 @@ public class AdminConsole {
     private void deleteTraining(User user) {
         System.out.println("Тренировки пользователя " + user.getName() + " :");
         trainingService.printUserTrainings(user);
-        System.out.print("Введите номер тренировки для удаления: ");
-        int index = scanner.nextInt();
+        System.out.print("Введите id тренировки для удаления: ");
+        long index = scanner.nextLong();
         scanner.nextLine();
-        trainingService.deleteTraining(userService.getUser(), index);
+        trainingService.deleteTraining(index);
     }
 }

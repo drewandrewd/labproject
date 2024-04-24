@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="insert-data-users" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">SELECT COUNT(*) FROM my_schema.users WHERE id IN (10000, 20000, 30000)</sqlCheck>
+            </not>
+        </preConditions>
+        <insert schemaName="my_schema" tableName="users">
+            <column name="id" valueNumeric="10000"/>
+            <column name="username" value="user1"/>
+            <column name="password" value="password1"/>
+        </insert>
+        <insert schemaName="my_schema" tableName="users">
+            <column name="id" valueNumeric="20000"/>
+            <column name="username" value="user2"/>
+            <column name="password" value="password2"/>
+        </insert>
+        <insert schemaName="my_schema" tableName="users">
+            <column name="id" valueNumeric="30000"/>
+            <column name="username" value="user3"/>
+            <column name="password" value="password3"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert-data-trainings" author="author">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">SELECT COUNT(*) FROM my_schema.trainings WHERE id IN (1000, 2000, 3000)</sqlCheck>
+            </not>
+        </preConditions>
+        <insert schemaName="my_schema" tableName="trainings">
+            <column name="id" valueNumeric="1000"/>
+            <column name="type" value="Бег"/>
+            <column name="duration_minutes" valueNumeric="30"/>
+            <column name="calories_burned" valueNumeric="200"/>
+            <column name="additional_information" value="Утренняя тренировка"/>
+            <column name="datetime" value="2023-04-10 08:00:00"/>
+            <column name="user_id" valueNumeric="10000"/>
+        </insert>
+        <insert schemaName="my_schema" tableName="trainings">
+            <column name="id" valueNumeric="2000"/>
+            <column name="type" value="Плавание"/>
+            <column name="duration_minutes" valueNumeric="45"/>
+            <column name="calories_burned" valueNumeric="30"/>
+            <column name="additional_information" value="Вечерняя тренировка"/>
+            <column name="datetime" value="2023-04-10 18:00:00"/>
+            <column name="user_id" valueNumeric="20000"/>
+        </insert>
+        <insert schemaName="my_schema" tableName="trainings">
+            <column name="id" valueNumeric="3000"/>
+            <column name="type" value="Йога"/>
+            <column name="duration_minutes" valueNumeric="60"/>
+            <column name="calories_burned" valueNumeric="250"/>
+            <column name="additional_information" value="Послеобеденная практика"/>
+            <column name="datetime" value="2023-04-10 14:00:00"/>
+            <column name="user_id" valueNumeric="30000"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

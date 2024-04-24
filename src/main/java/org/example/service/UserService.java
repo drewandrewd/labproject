@@ -1,55 +1,73 @@
 package org.example.service;
 
 import lombok.Data;
+import org.example.dao.AuditDao;
+import org.example.dao.UserDao;
 import org.example.model.User;
-import org.example.repositories.AuditRepository;
-import org.example.repositories.UserRepository;
+
+import java.time.LocalDateTime;
 
 /**
- * Класс UserController управляет операциями с пользователями в системе.
+ * Класс UserService управляет операциями с пользователями в системе.
  */
 @Data
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final AuditRepository auditRepository;
+    private static UserService instance;
+    private UserDao userDao;
+    private AuditService auditService;
     private User user;
 
-    public UserService() {
-        this.userRepository = new UserRepository();
+    private UserService() {
+        this.userDao = new UserDao();
         this.user = null;
-        this.auditRepository = new AuditRepository();
+        this.auditService = new AuditService();
     }
 
     /**
-     * Регистрация пользователя
+     * Получение единственного экземпляра класса UserService.
+     *
+     * @return возвращает экземпляр класса UserService
+     */
+    public static UserService getInstance() {
+        if (instance == null) {
+            instance = new UserService();
+        }
+        return instance;
+    }
+
+    /**
+     * Регистрация нового пользователя.
+     *
      * @param userName Имя пользователя.
      * @param password Пароль пользователя.
      */
     public void register(String userName, String password) {
         User user = new User(userName, password);
-        userRepository.register(user);
+        userDao.register(user);
+        auditService.logAuthentication(userName, true, LocalDateTime.now());
     }
 
     /**
-     * Авторизация пользователя
+     * Авторизация пользователя.
+     *
      * @param userName Имя пользователя.
      * @param password Пароль пользователя.
      */
     public void login(String userName, String password) {
-        User user = userRepository.login(userName, password);
+        User user = userDao.login(userName, password);
         if (user != null) {
-            this.user = user;
+            setUser(user);
             System.out.println("Вход выполнен успешно");
-            auditRepository.logAuthentication(userName, true);
+            auditService.logAuthentication(userName, true, LocalDateTime.now());
         } else {
             System.out.println("Неправильный логин или пароль");
-            auditRepository.logAuthentication(userName, false);
+            auditService.logAuthentication(userName, false, LocalDateTime.now());
         }
     }
 
     /**
-     * Выход из системы
+     * Выход из системы.
      */
     public void logout() {
         this.user = null;
@@ -57,21 +75,26 @@ public class UserService {
     }
 
     /**
-     * Проверка на админа
+     * Проверка, является ли текущий пользователь администратором.
+     *
+     * @return возвращает true, если пользователь является администратором, иначе false
      */
     public boolean isAdmin() {
         return this.user != null && this.user.isAdmin();
     }
 
     /**
-     * Проверка на авторизацию
+     * Проверка, авторизован ли текущий пользователь.
+     *
+     * @return возвращает true, если пользователь авторизован, иначе false
      */
     public boolean isLoggedIn() {
         return this.user != null;
     }
 
     /**
-     * Присвоение пользователя контроллеру
+     * Установка текущего пользователя.
+     *
      * @param user пользователь
      */
     public void setCurrentUser(User user) {
@@ -79,20 +102,19 @@ public class UserService {
     }
 
     /**
-     * Печать всех рользователей в консоль
+     * Печать всех пользователей в консоль.
      */
     public void printUsers() {
-        userRepository.getAllUsers().keySet().forEach(System.out::println);
+        userDao.getAllUsers().forEach(System.out::println);
     }
 
     /**
-     * Получение пользователя по username
+     * Получение пользователя по его имени пользователя (username).
+     *
      * @param username имя пользователя
+     * @return возвращает объект пользователя
      */
     public User getUserByUsername(String username) {
-        return userRepository.getAllUsers().values().stream()
-                .filter(user -> user.getName().equals(username))
-                .findFirst()
-                .orElse(null);
+        return userDao.getUserByUsername(username);
     }
 }
